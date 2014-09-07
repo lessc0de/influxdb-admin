@@ -211,7 +211,6 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $q.when(window.influxdb.deleteDatabase(name)).then (response) ->
       $scope.alertSuccess("Successfully removed database: #{name}")
       $scope.getDatabases()
-      $scope.showDatabases()
     , (response) ->
       $scope.alertFailure("Failed to remove database: #{response.responseText}")
 
@@ -251,6 +250,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $scope.getDatabaseUsers()
 
   $scope.showDatabases = () ->
+    $scope.getDatabases()
     $scope.selectedPane = 'databases'
     $scope.selectedSubPane = 'users'
     $scope.selectedDatabase = null
@@ -289,14 +289,15 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $scope.getContinuousQueries()
 
   $scope.showClusterAdmins = () ->
+    $scope.getClusterAdmins()
     $scope.selectedPane = "admins"
     $scope.selectedClusterAdmin = null
 
   $scope.showClusterConfiguration = () ->
-    $scope.selectedPane = "cluster"
     $scope.getClusterServers()
     $scope.getClusterShards()
     $scope.getClusterShardSpaces()
+    $scope.selectedPane = "cluster"
 
   $scope.getClusterServers = () ->
     $q.when(window.influxdb.getClusterServers()).then (response) ->
