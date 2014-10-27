@@ -267,8 +267,8 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $scope.getDatabaseUsers()
 
   $scope.getContinuousQueries = () ->
-    $q.when(window.influxdb.getContinuousQueries($scope.selectedDatabase)).then (response) ->
-      $scope.continuousQueries = response
+    $q.when(window.influxdb.getClusterConfiguration()).then (response) ->
+      $scope.continuousQueries = response.ContinuousQueries[$scope.selectedDatabase]
 
   $scope.showContinuousQueries = () ->
     $scope.selectedDatabaseUser = null
