@@ -26,7 +26,8 @@ html
                       | InfluxDB features a &nbsp;
                       a#queryHelp.modal-help-link target="_self" href="/help/queries.html" SQL-like query language
                     button.tiny.button ng-click="readData()" Execute Query
-                    span.label.alert#queryFailure style="display:none; margin-left:20px;" {{queryMessage}}
+                    span.label.success#querySuccess style="display:none; margin-left:20px;" {{querySuccessMessage}}
+                    span.label.alert#queryFailure style="display:none; margin-left:20px;" {{queryFailureMessage}}
 
                 div ng-repeat="datum in data"
                   h4

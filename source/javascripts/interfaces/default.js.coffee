@@ -22,7 +22,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", ($scope, $lo
   $scope.successMessage = "OK"
   $scope.alertMessage = "Error"
   $scope.authMessage = ""
-  $scope.queryMessage = ""
+  $scope.queryFailureMessage = ""
   $scope.selectedPane = "data"
 
   $scope.writeData = () ->
@@ -45,6 +45,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", ($scope, $lo
 
     $q.when(window.parent.influxdb.query($scope.readQuery)).then (response) ->
       data = response
+      $scope.querySuccess("200 OK")
       data.forEach (datum) ->
         $scope.data.push
           name: datum.name
@@ -52,8 +53,14 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", ($scope, $lo
           points: datum.points
           graphs: $scope.filteredColumns(datum).map (column) ->
             $scope.columnPoints(datum, column)
-    , (response) ->
-      $scope.queryMessage = "ERROR: #{response.responseText}"
+    , (response) -> $scope.queryFailure(response.responseText)
+
+  $scope.querySuccess = (msg) ->
+    $scope.querySuccessMessage = "200 OK"
+    $("span#querySuccess").show().delay(2500).fadeOut(500)
+
+  $scope.queryFailure = (msg) ->
+      $scope.queryFailureMessage = "ERROR: #{msg}"
       $("span#queryFailure").show().delay(3500).fadeOut(1000)
 
   $scope.error = (msg) ->
