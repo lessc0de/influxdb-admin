@@ -53,7 +53,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
 
   $scope.alertFailure = (msg) ->
     $scope.failureMessage = msg
-    $("#alert-failure").show().delay(2500).fadeOut(500)
+    $("#alert-failure").show().delay(3500).fadeOut(500)
 
   $scope.getHashParams = () ->
     $location.search()
@@ -216,15 +216,15 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
 
   $scope.authError = (msg) ->
     $scope.authMessage = msg
-    $("span#authFailure").show().delay(1500).fadeOut(500)
+    $("span#authFailure").show().delay(3500).fadeOut(500)
 
   $scope.error = (msg) ->
     $scope.alertMessage = msg
-    $("span#writeFailure").show().delay(1500).fadeOut(500)
+    $("span#writeFailure").show().delay(3500).fadeOut(500)
 
   $scope.success = (msg) ->
     $scope.successMessage = msg
-    $("span#writeSuccess").show().delay(1500).fadeOut(500)
+    $("span#writeSuccess").show().delay(2500).fadeOut(500)
 
   $scope.filteredColumns = (datum) ->
     datum.columns.filter (d) -> d != "time" && d != "sequence_number"

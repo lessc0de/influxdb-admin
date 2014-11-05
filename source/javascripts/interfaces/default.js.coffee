@@ -34,7 +34,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", ($scope, $lo
       values = JSON.parse($scope.writeValues)
     catch
       $scope.alertMessage = "Unable to parse JSON."
-      $("span#writeFailure").show().delay(1500).fadeOut(500)
+      $("span#writeFailure").show().delay(3500).fadeOut(500)
       return
 
     $q.when(parent.influxdb.writePoint($scope.writeSeriesName, values)).then (response) ->
@@ -54,15 +54,15 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", ($scope, $lo
             $scope.columnPoints(datum, column)
     , (response) ->
       $scope.queryMessage = "ERROR: #{response.responseText}"
-      $("span#queryFailure").show().delay(2500).fadeOut(1000)
+      $("span#queryFailure").show().delay(3500).fadeOut(1000)
 
   $scope.error = (msg) ->
     $scope.alertMessage = msg
-    $("span#writeFailure").show().delay(1500).fadeOut(500)
+    $("span#writeFailure").show().delay(3500).fadeOut(500)
 
   $scope.success = (msg) ->
     $scope.successMessage = msg
-    $("span#writeSuccess").show().delay(1500).fadeOut(500)
+    $("span#writeSuccess").show().delay(2500).fadeOut(500)
 
   $scope.filteredColumns = (datum) ->
     columns = []
