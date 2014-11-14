@@ -36,11 +36,8 @@ html
               li ng-class="" ng-show="isClusterAdmin"
                 a ng-click="showClusterConfiguration()" Cluster
 
-              li.has-dropdown ng-class="{active: selectedPane == 'data'}"
-                a href="#" ng-hide="isClusterAdmin" Interfaces
-                ul.dropdown
-                  li ng-repeat="i in interfaces"
-                    a href="#" ng-click="setCurrentInterface(i)" {{humanize(i)}}
+              li ng-class="{active: selectedPane == 'data'}" ng-hide="isClusterAdmin"
+                a ng-click="showDefaultInterface(selectedDatabase)" Explore Data
 
             ul.right ng-show="authenticated"
               li.has-form

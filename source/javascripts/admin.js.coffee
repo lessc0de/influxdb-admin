@@ -61,10 +61,6 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
   $scope.setHashParams = (params) ->
     $location.search(params)
 
-  $scope.getInterfaces = () ->
-    $q.when(window.influxdb.getInterfaces()).then (response) ->
-      $scope.interfaces = response
-
   $scope.humanize = (title) ->
     title.replace(/_/g, ' ').replace /(\w+)/g, (match) ->
       match.charAt(0).toUpperCase() + match.slice(1);
@@ -99,7 +95,6 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
       $scope.selectedPane = "databases"
       $scope.selectedSubPane = "users"
       $scope.storeAuthenticatedCredentials()
-      $scope.getInterfaces()
       $scope.getDatabases()
       $scope.getClusterAdmins()
       if $scope.database
@@ -129,7 +124,6 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
       # $scope.setCurrentInterface("default")
       $location.search({})
       $scope.storeAuthenticatedCredentials()
-      $scope.getInterfaces()
       $scope.getDatabaseUsers()
 
     , (response) ->
