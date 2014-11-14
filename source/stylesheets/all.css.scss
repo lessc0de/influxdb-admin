@@ -1,12 +1,10 @@
-@import url("//fonts.googleapis.com/css?family=PT+Sans:400,700");
-
 @import "normalize";
 @import "foundation";
 @import "font-mfizz";
 @import "vendor/font-awesome-4.1.0.min";
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "PT Sans", sans-serif;
+  font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
   font-weight: 700;
   -webkit-font-smoothing: antialiased;
 }
