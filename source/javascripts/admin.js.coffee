@@ -275,13 +275,6 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $scope.selectedSubPane = "continuousQueries"
     $scope.getContinuousQueries()
 
-  $scope.deleteContinuousQuery = (continuousQuery) ->
-    $q.when(window.influxdb.deleteContinuousQuery($scope.selectedDatabase, continuousQuery.id)).then (response) ->
-      $scope.alertSuccess("Successfully deleted conitinuous query: '#{continuousQuery.id}'")
-      $scope.getContinuousQueries()
-    , (response) ->
-      $scope.alertFailure("Failed to delete continuous query: #{response.responseText}")
-
   $scope.showDbSettings = () ->
     $scope.selectedDatabaseUser = null
     $scope.selectedSubPane = "settings"
