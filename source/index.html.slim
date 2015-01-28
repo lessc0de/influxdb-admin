@@ -76,36 +76,6 @@
                     i.fa.fa-times
 
 
-            h2 Shard Spaces
-            table.twelve.columns ng-show="clusterShardSpaces"
-              thead
-                tr
-                  td Database
-                  td Name
-                  td Series to match
-                  td Retention Policy
-                  td Shard Duration
-                  td RF
-                  td Split
-
-              tr ng-repeat="space in clusterShardSpaces"
-                td
-                  ' {{space.database}}
-                td
-                  ' {{space.name}}
-                td
-                  ' {{space.regex}}
-                td
-                  ' {{space.retentionPolicy}}
-                td
-                  ' {{space.shardDuration}}
-                td
-                  ' {{space.replicationFactor}}
-                td
-                  ' {{space.split}}
-            .panel ng-hide="clusterShardSpaces"
-              h5 No Shard Spaces Currently Exist
-
       div ng-show="selectedPane == 'databases'"
         section ng-show="selectedDatabase == null && isClusterAdmin"
           .row
@@ -132,48 +102,10 @@
                 fieldset
                   legend Create a Database
                   .row
-                    .large-3.columns
+                    .large-6.columns
                       h5 Database Details
                       input type="text" placeholder="Database Name" ng-model="newDatabaseName"
-                    .large-9.columns
-                  .row
-                    .large-12.columns
-                      h5 Shard Spaces
-                  .row ng-hide="shardSpaces.length == 0"
-                    .large-3.columns
-                      h6 Name
-                    .large-1.columns
-                      h6 Retention
-                    .large-1.columns
-                      h6 Duration
-                    .large-2.columns
-                      h6 RegEx
-                    .large-1.columns
-                      h6 RF
-                    .large-1.columns
-                      h6 Split
-                    .large-3.columns
-                  .row ng-repeat="shardSpace in shardSpaces"
-                    .large-3.columns
-                      input type="text" placeholder="Space Name" ng-model="shardSpace.name"
-                    .large-1.columns
-                      select ng-model="shardSpace.retentionPolicy" ng-options="duration for duration in shardSpaceRetentionPolicies"
-                    .large-1.columns
-                      select ng-model="shardSpace.shardDuration" ng-options="duration for duration in shardSpaceDurations"
-                    .large-2.columns
-                      input type="text" placeholder="RegEx" ng-model="shardSpace.regEx"
-                    .large-1.columns
-                      select ng-model="shardSpace.replicationFactor" ng-options="factor for factor in shardSpaceReplicationFactors"
-                    .large-1.columns
-                      select ng-model="shardSpace.split" ng-options="split for split in shardSpaceSplits"
-                    .large-3.columns
-                      button.tiny.alert.button type="button" ng-click="removeShardSpace($index)" Remove
-                  .row
-                    .large-12.columns
-                      button.tiny.button type="button" ng-click="addShardSpace()" Add Shard Space
-                  .row style="border-top: 1px solid #ccc"
-                    .large-12.columns style="text-align:right;"
-                      button.small.button style="margin-top:1.25rem;margin-bottom:0;" ng-click="submit()" Create Database
+                      button.tiny.button style="margin-top:1.25rem;margin-bottom:0;" ng-click="submit()" Create Database
 
         section#database-header ng-show="selectedDatabase != null"
           .row

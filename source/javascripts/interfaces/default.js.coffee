@@ -43,7 +43,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", ($scope, $lo
   $scope.readData = () ->
     $scope.data = []
 
-    $q.when(window.parent.influxdb.query($scope.readQuery)).then (response) ->
+    $q.when(window.parent.influxdb.queryDatabase($scope.readQuery)).then (response) ->
       data = response
       data.forEach (datum) ->
         $scope.data.push

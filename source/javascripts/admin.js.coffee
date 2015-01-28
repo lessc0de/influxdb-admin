@@ -88,22 +88,22 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
       password: $scope.password
       ssl: $scope.ssl
 
-    $q.when(window.influxdb.authenticateClusterAdmin()).then (response) ->
-      $scope.authenticated = true
-      $scope.isClusterAdmin = true
-      $scope.isDatabaseAdmin = false
-      $scope.selectedPane = "databases"
-      $scope.selectedSubPane = "users"
-      $scope.storeAuthenticatedCredentials()
-      $scope.getDatabases()
-      $scope.getClusterAdmins()
-      if $scope.database
-        $scope.selectedDatabase = $scope.database
-        $scope.getDatabaseUsers()
+    # $q.when(window.influxdb.authenticateClusterAdmin()).then (response) ->
+    $scope.authenticated = true
+    $scope.isClusterAdmin = true
+    $scope.isDatabaseAdmin = false
+    $scope.selectedPane = "databases"
+    $scope.selectedSubPane = "users"
+    $scope.storeAuthenticatedCredentials()
+    $scope.getDatabases()
+    $scope.getClusterAdmins()
+    if $scope.database
+      $scope.selectedDatabase = $scope.database
+      $scope.showUsers()
 
-      $location.search({})
-    , (response) ->
-      $scope.alertFailure("Couldn't authenticate user: #{response.responseText}")
+    $location.search({})
+    # , (response) ->
+      # $scope.alertFailure("Couldn't authenticate user: #{response.responseText}")
 
   $scope.authenticateAsDatabaseAdmin = () ->
     window.influxdb = new InfluxDB
@@ -114,20 +114,20 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
       database: $scope.database
       ssl: $scope.ssl
 
-    $q.when(window.influxdb.authenticateDatabaseUser($scope.database)).then (response) ->
-      $scope.authenticated = true
-      $scope.isDatabaseAdmin = true
-      $scope.isClusterAdmin = false
-      $scope.selectedPane = "databases"
-      $scope.selectedSubPane = "users"
-      $scope.selectedDatabase = $scope.database
-      # $scope.setCurrentInterface("default")
-      $location.search({})
-      $scope.storeAuthenticatedCredentials()
-      $scope.getDatabaseUsers()
+    # $q.when(window.influxdb.authenticateDatabaseUser($scope.database)).then (response) ->
+    $scope.authenticated = true
+    $scope.isDatabaseAdmin = true
+    $scope.isClusterAdmin = false
+    $scope.selectedPane = "databases"
+    $scope.selectedSubPane = "users"
+    $scope.selectedDatabase = $scope.database
+    # $scope.setCurrentInterface("default")
+    $location.search({})
+    $scope.storeAuthenticatedCredentials()
+    $scope.showUsers()
 
-    , (response) ->
-      $scope.authenticateAsClusterAdmin()
+    # , (response) ->
+      # $scope.authenticateAsClusterAdmin()
 
   $scope.storeAuthenticatedCredentials = () ->
     $cookieStore.put("username", $scope.username)
@@ -138,11 +138,11 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $cookieStore.put("ssl", $scope.ssl)
 
   $scope.getDatabases = () ->
-    $q.when(window.influxdb.getDatabases()).then (response) ->
-      $scope.databases = response
-      $scope.shardSpaces = []
-      $scope.addShardSpace()
-
+    $q.when(window.influxdb.showDatabases()).then (response) ->
+      result = response.results[0]
+      row = result.rows[0]
+      $scope.databases = row.values.map (value) ->
+        name: value[0]
 
   $scope.getClusterAdmins = () ->
     $q.when(window.influxdb.getClusterAdmins()).then (response) ->
@@ -167,24 +167,8 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     , (response) ->
       $scope.alertFailure("Failed to create user: #{response.responseText}")
 
-  $scope.addShardSpace = () ->
-    $scope.shardSpaces.push
-      name: "default"
-      regEx: "/.*/"
-      retentionPolicy: "inf"
-      shardDuration: "7d"
-      replicationFactor: 1
-      split: 1
-
-  $scope.removeShardSpace = (index) ->
-    $scope.shardSpaces.splice(index,1)
-    if $scope.shardSpaces.length == 0
-      $scope.addShardSpace()
-
   $scope.createDatabase = () ->
-    data = {spaces: $scope.shardSpaces}
-
-    $q.when(window.influxdb.createDatabaseConfig($scope.newDatabaseName, data)).then (response) ->
+    $q.when(window.influxdb.createDatabase($scope.newDatabaseName)).then (response) ->
       $scope.alertSuccess("Successfully created database: #{$scope.newDatabaseName}")
       $scope.newDatabaseName = null
       $scope.getDatabases()
@@ -202,7 +186,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
       $scope.alertFailure("Failed to create user: #{response.responseText}")
 
   $scope.deleteDatabase = (name) ->
-    $q.when(window.influxdb.deleteDatabase(name)).then (response) ->
+    $q.when(window.influxdb.dropDatabase(name)).then (response) ->
       $scope.alertSuccess("Successfully removed database: #{name}")
       $scope.getDatabases()
     , (response) ->
