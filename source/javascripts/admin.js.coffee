@@ -1,10 +1,5 @@
 adminApp = angular.module "adminApp", ["ngCookies"]
 
-adminApp.config ["$locationProvider", ($locationProvider) ->
-  $locationProvider.html5Mode(true)
-  $locationProvider.hashPrefix('!')
-]
-
 adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStore", ($scope, $location, $q, $cookieStore) ->
   $scope.host = $location.search()["host"] || $cookieStore.get("host") || $location.host()
   $scope.port = $location.search()["port"] || $cookieStore.get("port")
@@ -29,15 +24,10 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
   $scope.newDbUser = {}
   $scope.interfaces = []
   $scope.databaseUsers = []
+  $scope.retentionPolicies = []
   $scope.databaseUser = null
   $scope.successMessage = ""
   $scope.failureMessage = ""
-  $scope.shardSpaces = []
-  $scope.shardSpaceDurations = ["15m", "30m", "1h", "4h", "12h", "1d", "7d", "30d", "180d"]
-  $scope.shardSpaceRetentionPolicies = ["1h", "4h", "12h", "1d", "7d", "30d", "60d", "90d", "180d", "365d", "730d", "inf"]
-  $scope.shardSpaceReplicationFactors = [1, 3, 4, 5, 6]
-  $scope.shardSpaceSplits = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
 
   $scope.newAdminUsername = null
   $scope.newAdminPassword = null
@@ -54,12 +44,6 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
   $scope.alertFailure = (msg) ->
     $scope.failureMessage = msg
     $("#alert-failure").show().delay(2500).fadeOut(500)
-
-  $scope.getHashParams = () ->
-    $location.search()
-
-  $scope.setHashParams = (params) ->
-    $location.search(params)
 
   $scope.humanize = (title) ->
     title.replace(/_/g, ' ').replace /(\w+)/g, (match) ->
@@ -96,14 +80,10 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $scope.selectedSubPane = "users"
     $scope.storeAuthenticatedCredentials()
     $scope.getDatabases()
-    $scope.getClusterAdmins()
     if $scope.database
       $scope.selectedDatabase = $scope.database
       $scope.showUsers()
 
-    $location.search({})
-    # , (response) ->
-      # $scope.alertFailure("Couldn't authenticate user: #{response.responseText}")
 
   $scope.authenticateAsDatabaseAdmin = () ->
     window.influxdb = new InfluxDB
@@ -122,7 +102,6 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $scope.selectedSubPane = "users"
     $scope.selectedDatabase = $scope.database
     # $scope.setCurrentInterface("default")
-    $location.search({})
     $scope.storeAuthenticatedCredentials()
     $scope.showUsers()
 
@@ -144,28 +123,9 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
       $scope.databases = row.values.map (value) ->
         name: value[0]
 
-  $scope.getClusterAdmins = () ->
-    $q.when(window.influxdb.getClusterAdmins()).then (response) ->
-      $scope.admins = response
-
-  $scope.deleteClusterAdmin = (name) ->
-    if $scope.username == name
-      $scope.alertFailure("You can't delete the cluster admin you're currently logged in as.")
-    else
-      $q.when(window.influxdb.deleteClusterAdmin(name)).then (response) ->
-        $scope.alertSuccess("Successfully deleted cluster admin: #{name}")
-        $scope.getClusterAdmins()
-      , (response) ->
-        $scope.alertFailure("Failed to deleted cluster admin: #{response.responseText}")
-
-  $scope.createClusterAdmin = () ->
-    $q.when(window.influxdb.createClusterAdmin($scope.newAdminUsername, $scope.newAdminPassword)).then (response) ->
-      $scope.alertSuccess("Successfully created user: #{$scope.newAdminUsername}")
-      $scope.newAdminUsername = null
-      $scope.newAdminPassword = null
-      $scope.getClusterAdmins()
-    , (response) ->
-      $scope.alertFailure("Failed to create user: #{response.responseText}")
+  $scope.getUsers = () ->
+    $q.when(window.influxdb.getUsers()).then (response) ->
+      $scope.users = response
 
   $scope.createDatabase = () ->
     $q.when(window.influxdb.createDatabase($scope.newDatabaseName)).then (response) ->
@@ -174,16 +134,6 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
       $scope.getDatabases()
     , (response) ->
       $scope.alertFailure("Failed to create database: #{response.responseText}")
-
-  $scope.createDatabaseUser = () ->
-    $q.when(window.influxdb.createUser($scope.selectedDatabase, $scope.newDbUser.username, $scope.newDbUser.password)).then (response) ->
-      $scope.alertSuccess("Successfully created user: #{$scope.newDbUser.username}")
-      data = {admin: $scope.newDbUser.isAdmin}
-      window.influxdb.updateDatabaseUser($scope.selectedDatabase, $scope.newDbUser.username, data)
-      $scope.newDbUser = {}
-      $scope.getDatabaseUsers()
-    , (response) ->
-      $scope.alertFailure("Failed to create user: #{response.responseText}")
 
   $scope.deleteDatabase = (name) ->
     $q.when(window.influxdb.dropDatabase(name)).then (response) ->
@@ -214,8 +164,37 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
       value: row[index]
 
   $scope.getDatabaseUsers = () ->
-    $q.when(window.influxdb.getDatabaseUsers($scope.selectedDatabase)).then (response) ->
-      $scope.databaseUsers = response
+    $q.when(window.influxdb.showUsers()).then (response) ->
+      result = response.results[0]
+      row = result.rows[0]
+      $scope.databaseUsers = row.values.map (value) ->
+        name: value[0]
+        isAdmin: value[1]
+
+  $scope.getRetentionPolicies = () ->
+    $q.when(window.influxdb.showRetentionPolicies($scope.selectedDatabase)).then (response) ->
+      result = response.results[0]
+      row = result.rows[0]
+      if row.values
+        $scope.retentionPolicies = row.values.map (value) ->
+          name: value[0]
+          duration: value[1]
+          replicaN: value[2]
+      else
+        $scope.retentionPolicies = []
+
+  $scope.createRetentionPolicy = () ->
+    $q.when(window.influxdb.createRetentionPolicy($scope.selectedDatabase, $scope.newRetentionPolicyName, $scope.newRetentionPolicyDuration, $scope.newRetentionPolicyReplication, $scope.newRetentionPolicyIsDefault)).then (response) ->
+      $scope.alertSuccess("Successfully created retention policy: #{$scope.newRetentionPolicyName}")
+      $scope.newRetentionPolicyName = null
+      $scope.newRetentionPolicyDuration = null
+      $scope.newRetentionPolicyReplication = null
+      $scope.newRetentionPolicyIsDefault = false
+      $scope.getRetentionPolicies()
+    , (response) ->
+      $scope.alertFailure("Failed to create retention policy: #{response.responseText}")
+
+
 
   $scope.getDatabaseUser = () ->
     $q.when(window.influxdb.getDatabaseUser($scope.selectedDatabase, $scope.selectedDatabaseUser)).then (response) ->
@@ -226,6 +205,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $scope.selectedSubPane = 'users'
     $scope.selectedDatabaseUser = null
     $scope.getDatabaseUsers()
+    $scope.getRetentionPolicies()
 
   $scope.showDatabases = () ->
     $scope.getDatabases()
@@ -253,44 +233,10 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $scope.selectedSubPane = "continuousQueries"
     $scope.getContinuousQueries()
 
-  $scope.showDbSettings = () ->
+  $scope.showRetentionPolicies = () ->
     $scope.selectedDatabaseUser = null
-    $scope.selectedSubPane = "settings"
-    $scope.getDatabaseUsers()
-    $scope.getContinuousQueries()
-
-  $scope.showClusterAdmins = () ->
-    $scope.getClusterAdmins()
-    $scope.selectedPane = "admins"
-    $scope.selectedClusterAdmin = null
-
-  $scope.showClusterConfiguration = () ->
-    $scope.getClusterServers()
-    $scope.getClusterShards()
-    $scope.getClusterShardSpaces()
-    $scope.selectedPane = "cluster"
-
-  $scope.getClusterServers = () ->
-    $q.when(window.influxdb.getClusterServers()).then (response) ->
-      $scope.clusterServers = response
-
-  $scope.getClusterShards = () ->
-    $q.when(window.influxdb.getClusterShards()).then (response) ->
-      $scope.clusterShards = response
-
-  $scope.getClusterShardSpaces = () ->
-    $q.when(window.influxdb.getClusterShardSpaces()).then (response) ->
-      $scope.clusterShardSpaces = response
-
-  $scope.deleteClusterShard = (clusterShard) ->
-    $q.when(window.influxdb.deleteClusterShard(clusterShard.id, clusterShard.serverIds)).then (response) ->
-      $scope.alertSuccess("Successfully deleted shard: '#{clusterShard.id}'")
-      $scope.getClusterShards()
-    , (response) ->
-      $scope.alertFailure("Failed to delete shard: #{response.responseText}")
-
-  $scope.showClusterAdmin = (clusterAdmin) ->
-    $scope.selectedClusterAdmin = clusterAdmin.name
+    $scope.selectedSubPane = "retentionPolicies"
+    $scope.getRetentionPolicies()
 
   $scope.showDatabaseUser = (databaseUser) ->
     $scope.selectedDatabaseUser = databaseUser.name

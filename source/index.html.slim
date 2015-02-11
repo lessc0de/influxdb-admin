@@ -115,10 +115,7 @@
                   a.button.secondary.tiny ng-click="showDatabaseUsers()" ng-class="{active: selectedSubPane == 'users'}" title="Users"
                     i.fa.fa-users
                 li
-                  a.button.secondary.tiny ng-click="showContinuousQueries()" title="Continuous Queries" ng-class="{active: selectedSubPane == 'continuousQueries'}"
-                    i.fa.fa-refresh
-                li
-                  a.button.secondary.tiny ng-click="showDbSettings()" ng-class="{active: selectedSubPane == 'settings'}" title="Settings"
+                  a.button.secondary.tiny ng-click="showRetentionPolicies()" ng-class="{active: selectedSubPane == 'retentionPolicies'}" title="Retention Policies"
                     i.fa.fa-gears
               h2
                 i.icon-database
@@ -142,17 +139,45 @@
               .panel ng-hide="continuousQueries"
                 h5 No continuous queries defined!
 
-        div ng-show="selectedSubPane == 'settings'"
+        div ng-show="selectedSubPane == 'retentionPolicies'"
           .row
             .large-12.columns
-              h3 Settings &amp; Properties
-              .panel
-                h5
-                  ' {{databaseUsers.length}} users
-                h5
-                  ' {{continuousQueries.length}} continuous queries
-              hr
-              a.button.alert ng-click="deleteDatabase(selectedDatabase)" ng-confirm-click="Are you sure you want to delete this database?" Delete Database
+              h3 Retention Policies
+              table.twelve.columns
+                thead
+                  tr
+                    td Name
+                    td Duration
+                    td Replication
+                    td
+                tr ng-repeat="retentionPolicy in retentionPolicies"
+                  td
+                    ' {{retentionPolicy.name}}
+                  td
+                    ' {{retentionPolicy.duration}}
+                  td
+                    ' {{retentionPolicy.replicaN}}
+                  td style="text-align:right;"
+                    a style="display:none;" ng-click="deleteRetentionPolicy(retentionPolicy.name)" ng-confirm-click="Are you sure you want to delete this retention policy?"
+                      i.fa.fa-times
+
+          .row
+            .large-12.columns
+              form ng-submit="createRetentionPolicy()"
+                fieldset
+                  legend Create Retention Policy
+                  .row
+                    .large-4.columns
+                      input type="text" placeholder="Name" ng-model="newRetentionPolicyName"
+                    .large-2.columns
+                      input type="text" placeholder="Duration" ng-model="newRetentionPolicyDuration"
+                    .large-2.columns
+                      input type="text" placeholder="Replication" ng-model="newRetentionPolicyReplication"
+                    .large-2.columns style="padding-top: 10px;"
+                      input type="checkbox" ng-model="newRetentionPolicyIsDefault"
+                      label Default?
+                    .large-2.columns
+                      button.tiny.button ng-click="submit()" Create
 
         div ng-show="selectedSubPane == 'users'"
           section ng-show="selectedDatabase != null && selectedDatabaseUser != null"

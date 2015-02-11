@@ -26,32 +26,36 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", ($scope, $lo
   $scope.selectedPane = "data"
 
   $scope.writeData = () ->
-    unless $scope.writeSeriesName
-      $scope.error("Time Series Name is required.")
-      return
-
     try
-      values = JSON.parse($scope.writeValues)
+      values = JSON.parse($scope.writePayload)
     catch
       $scope.alertMessage = "Unable to parse JSON."
       $("span#writeFailure").show().delay(1500).fadeOut(500)
       return
 
-    $q.when(parent.influxdb.writePoint($scope.writeSeriesName, values)).then (response) ->
+    $q.when(parent.influxdb.writeJSON($scope.writePayload)).then (response) ->
       $scope.success("200 OK")
+    , (response) ->
+      if response.status == 200
+        $scope.success("XHR 200 OK")
+      else
+        $scope.error(response.statusText)
 
   $scope.readData = () ->
     $scope.data = []
 
     $q.when(window.parent.influxdb.queryDatabase($scope.readQuery)).then (response) ->
-      data = response
-      data.forEach (datum) ->
-        $scope.data.push
-          name: datum.name
-          columns: datum.columns
-          points: datum.points
-          graphs: $scope.filteredColumns(datum).map (column) ->
-            $scope.columnPoints(datum, column)
+      data = response.results[0]
+      if $.isEmptyObject(data)
+        $scope.queryMessage = "No values returned."
+        $("span#queryFailure").show().delay(2500).fadeOut(1000)
+      else
+        data.rows.forEach (row) ->
+          $scope.data.push
+            name: row.name
+            columns: row.columns
+            points: row.values
+            # graphs: $scope.filteredColumns(row).map (column) -> $scope.columnPoints(row, column)
     , (response) ->
       $scope.queryMessage = "ERROR: #{response.responseText}"
       $("span#queryFailure").show().delay(2500).fadeOut(1000)

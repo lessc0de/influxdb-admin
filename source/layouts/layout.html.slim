@@ -23,21 +23,12 @@ html
 
           section.top-bar-section
             ul.left ng-show="authenticated"
-              li ng-class="" ng-show="!isClusterAdmin"
+              li ng-class=""
                 a ng-click="showSelectedDatabase()"
                   ' {{selectedDatabase}}
 
-              li ng-class="" ng-show="isClusterAdmin"
+              li ng-class=""
                 a ng-click="showDatabases()" Databases
-
-              li ng-class="" ng-show="isClusterAdmin"
-                a ng-click="showClusterAdmins()" Cluster Admins
-
-              li ng-class="" ng-show="isClusterAdmin"
-                a ng-click="showClusterConfiguration()" Cluster
-
-              li ng-class="{active: selectedPane == 'data'}" ng-hide="isClusterAdmin"
-                a ng-click="showDefaultInterface(selectedDatabase)" Explore Data
 
             ul.right ng-show="authenticated"
               li.has-form

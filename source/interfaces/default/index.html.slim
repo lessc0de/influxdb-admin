@@ -44,11 +44,9 @@ html
 
                 form
                   fieldset
-                    legend Write Point
-                    label Time Series Name
-                    input type="text" ng-model="writeSeriesName"
-                    label Values
-                    textarea placeholder="{ ... }" ng-model="writeValues"
-                    button.tiny.button ng-click="writeData()" Write Point
+                    legend Write Data
+                    label JSON Payload
+                    textarea placeholder="{ ... }" ng-model="writePayload" style="font-family: Courier; height: 250px;"
+                    button.tiny.button ng-click="writeData()" Write Data
                     span.label.success#writeSuccess style="display:none; margin-left:20px;" {{successMessage}}
                     span.label.alert#writeFailure style="display:none; margin-left:20px;" {{alertMessage}}
