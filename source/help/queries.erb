@@ -1,4 +1,4 @@
-<% functions = ["count()", "min()", "max()", "mean()", "mode()", "median()", "distinct()", "percentile()", "histogram()", "derivative()", "sum()", "stddev()", "first()", "last()"] %>
+<% functions = ["count()", "min()", "max()", "mean()", "percentile()", "sum()", "stddev()", "first()", "last()"] %>
 
 <div class="modal-content help">
   <h3>Example Queries</h3>
@@ -11,9 +11,6 @@
 
     -- 95th percentile of response times in 30 second intervals
     select percentile(value, 95) from response_times group by time(30s);
-
-    -- count the number of distinct users who make api requests
-    select count(distinct(user_id)) from api-requests;
   <% end %>
 
   <p>
