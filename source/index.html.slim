@@ -115,6 +115,9 @@
                   a.button.secondary.tiny ng-click="showDatabaseUsers()" ng-class="{active: selectedSubPane == 'users'}" title="Users"
                     i.fa.fa-users
                 li
+                  a.button.secondary.tiny ng-click="showContinuousQueries()" title="Continuous Queries" ng-class="{active: selectedSubPane == 'continuousQueries'}"
+                    i.fa.fa-refresh
+                li
                   a.button.secondary.tiny ng-click="showRetentionPolicies()" ng-class="{active: selectedSubPane == 'retentionPolicies'}" title="Retention Policies"
                     i.fa.fa-gears
               h2
@@ -132,9 +135,9 @@
                     td Query
                 tr ng-repeat="continuousQuery in continuousQueries"
                   td
-                    ' {{continuousQuery.Id}}
+                    ' {{continuousQuery.id}}
                   td
-                    ' {{continuousQuery.Query}}
+                    ' {{continuousQuery.query}}
 
               .panel ng-hide="continuousQueries"
                 h5 No continuous queries defined!

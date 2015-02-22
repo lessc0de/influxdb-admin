@@ -194,8 +194,6 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     , (response) ->
       $scope.alertFailure("Failed to create retention policy: #{response.responseText}")
 
-
-
   $scope.getDatabaseUser = () ->
     $q.when(window.influxdb.getDatabaseUser($scope.selectedDatabase, $scope.selectedDatabaseUser)).then (response) ->
       $scope.databaseUser = response
@@ -225,8 +223,17 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
     $scope.getDatabaseUsers()
 
   $scope.getContinuousQueries = () ->
-    $q.when(window.influxdb.getClusterConfiguration()).then (response) ->
-      $scope.continuousQueries = response.ContinuousQueries[$scope.selectedDatabase]
+    $q.when(window.influxdb.showContinuousQueries()).then (response) ->
+      result = response.results[0]
+      rows = result.rows.filter (row) ->
+        row.name == $scope.selectedDatabase
+      row = rows[0]
+      if row.values
+        $scope.continuousQueries = row.values.map (value) ->
+          id: value[0]
+          query: value[1]
+      else
+        $scope.continuousQueries = []
 
   $scope.showContinuousQueries = () ->
     $scope.selectedDatabaseUser = null
