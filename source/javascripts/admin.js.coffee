@@ -119,7 +119,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
   $scope.getDatabases = () ->
     $q.when(window.influxdb.showDatabases()).then (response) ->
       result = response.results[0]
-      row = result.rows[0]
+      row = result.series[0]
       $scope.databases = row.values.map (value) ->
         name: value[0]
 
@@ -166,15 +166,18 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
   $scope.getDatabaseUsers = () ->
     $q.when(window.influxdb.showUsers()).then (response) ->
       result = response.results[0]
-      row = result.rows[0]
-      $scope.databaseUsers = row.values.map (value) ->
-        name: value[0]
-        isAdmin: value[1]
+      row = result.series[0]
+      if row.values
+        $scope.databaseUsers = row.values.map (value) ->
+          name: value[0]
+          isAdmin: value[1]
+      else
+        $scope.databaseUsers = []
 
   $scope.getRetentionPolicies = () ->
     $q.when(window.influxdb.showRetentionPolicies($scope.selectedDatabase)).then (response) ->
       result = response.results[0]
-      row = result.rows[0]
+      row = result.series[0]
       if row.values
         $scope.retentionPolicies = row.values.map (value) ->
           name: value[0]
@@ -225,9 +228,9 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", "$cookieStor
   $scope.getContinuousQueries = () ->
     $q.when(window.influxdb.showContinuousQueries()).then (response) ->
       result = response.results[0]
-      rows = result.rows.filter (row) ->
+      series = result.series.filter (row) ->
         row.name == $scope.selectedDatabase
-      row = rows[0]
+      row = series[0]
       if row.values
         $scope.continuousQueries = row.values.map (value) ->
           id: value[0]

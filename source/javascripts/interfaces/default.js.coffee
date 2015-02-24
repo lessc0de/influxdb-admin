@@ -50,7 +50,7 @@ adminApp.controller "AdminIndexCtrl", ["$scope", "$location", "$q", ($scope, $lo
         $scope.queryMessage = "No values returned."
         $("span#queryFailure").show().delay(2500).fadeOut(1000)
       else
-        data.rows.forEach (row) ->
+        data.series.forEach (row) ->
           $scope.data.push
             name: row.name
             columns: row.columns
