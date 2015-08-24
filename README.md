@@ -1,6 +1,6 @@
 # InfluxDB Admin Interface
 
-> This is the source for the admin interface that ships with InfluxDB for **versions prior to 0.9**. Feel free to fork this repository, make changes, and use your own variant of the interface with InfluxDB. It's currenly built using AngularJS.
+> This is the source for the admin interface that ships with InfluxDB for **versions prior to 0.9**. Feel free to fork this repository, make changes, and use your own variant of the interface with InfluxDB. It's currenly built using AngularJS. If you're looking for the **newer** version of the interface, go here: [https://github.com/influxdb/influxdb/tree/master/shared/admin](https://github.com/influxdb/influxdb/tree/master/shared/admin)
 
 ### Running
 
